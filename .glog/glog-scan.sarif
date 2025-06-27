@@ -1,0 +1,180 @@
+{
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "Glog.AI",
+          "organization": "Glog.AI",
+          "fullName": "Glog, Making software more secure",
+          "version": "1.0.0",
+          "semanticVersion": "1.0.0",
+          "informationUri": "https://www.glog.ai",
+          "rules": [
+            {
+              "id": "glog-7eb2107a-d5c3-4fbd-91a2-5b9b03c05143",
+              "shortDescription": {
+                "text": "Network Policy should be enabled on GKE clusters"
+              },
+              "helpUri": "https://aquasecurity.github.io/tfsec/v1.28.6/checks/google/gke/enable-network-policy/",
+              "help": {
+                "text": "",
+                "markdown": "For more details, visit: [https://aquasecurity.github.io/tfsec/v1.28.6/checks/google/gke/enable-network-policy/](https://aquasecurity.github.io/tfsec/v1.28.6/checks/google/gke/enable-network-policy/)."
+              },
+              "properties": {
+                "tags": [
+                  "google-gke-enable-network-policy"
+                ]
+              }
+            },
+            {
+              "id": "glog-1e606477-adeb-4d9e-ab1c-fb57ced45afa",
+              "shortDescription": {
+                "text": "Pod security policy enforcement not defined."
+              },
+              "helpUri": "https://aquasecurity.github.io/tfsec/v1.28.6/checks/google/gke/enforce-pod-security-policy/",
+              "help": {
+                "text": "",
+                "markdown": "For more details, visit: [https://aquasecurity.github.io/tfsec/v1.28.6/checks/google/gke/enforce-pod-security-policy/](https://aquasecurity.github.io/tfsec/v1.28.6/checks/google/gke/enforce-pod-security-policy/)."
+              },
+              "properties": {
+                "tags": [
+                  "google-gke-enforce-pod-security-policy"
+                ]
+              }
+            },
+            {
+              "id": "glog-f5088757-fe66-4df6-a601-ae43bab19f78",
+              "shortDescription": {
+                "text": "Clusters should be configured with Labels"
+              },
+              "helpUri": "https://aquasecurity.github.io/tfsec/v1.28.6/checks/google/gke/use-cluster-labels/",
+              "help": {
+                "text": "",
+                "markdown": "For more details, visit: [https://aquasecurity.github.io/tfsec/v1.28.6/checks/google/gke/use-cluster-labels/](https://aquasecurity.github.io/tfsec/v1.28.6/checks/google/gke/use-cluster-labels/)."
+              },
+              "properties": {
+                "tags": [
+                  "google-gke-use-cluster-labels"
+                ]
+              }
+            },
+            {
+              "id": "glog-ea59a35f-1b3a-4237-975e-66890df20d8b",
+              "shortDescription": {
+                "text": "Legacy metadata endpoints enabled."
+              },
+              "helpUri": "https://aquasecurity.github.io/tfsec/v1.28.6/checks/google/gke/metadata-endpoints-disabled/",
+              "help": {
+                "text": "",
+                "markdown": "For more details, visit: [https://aquasecurity.github.io/tfsec/v1.28.6/checks/google/gke/metadata-endpoints-disabled/](https://aquasecurity.github.io/tfsec/v1.28.6/checks/google/gke/metadata-endpoints-disabled/)."
+              },
+              "properties": {
+                "tags": [
+                  "google-gke-metadata-endpoints-disabled"
+                ]
+              }
+            }
+          ],
+          "language": "en-US",
+          "contents": [
+            "localizedData",
+            "nonLocalizedData"
+          ],
+          "isComprehensive": false
+        }
+      },
+      "language": "en-US",
+      "results": [
+        {
+          "ruleId": "glog-7eb2107a-d5c3-4fbd-91a2-5b9b03c05143",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Cluster does not have a network policy enabled."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cluster.tf"
+                },
+                "region": {
+                  "startLine": 40,
+                  "endLine": 40
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "glog-1e606477-adeb-4d9e-ab1c-fb57ced45afa",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Cluster pod security policy is not enforced."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cluster.tf"
+                },
+                "region": {
+                  "startLine": 22,
+                  "endLine": 614
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "glog-f5088757-fe66-4df6-a601-ae43bab19f78",
+          "kind": "fail",
+          "level": "note",
+          "message": {
+            "text": "Cluster does not use GCE resource labels."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cluster.tf"
+                },
+                "region": {
+                  "startLine": 28,
+                  "endLine": 28
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "glog-ea59a35f-1b3a-4237-975e-66890df20d8b",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Cluster has legacy metadata endpoints enabled."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cluster.tf"
+                },
+                "region": {
+                  "startLine": 714,
+                  "endLine": 955
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "newlineSequences": [
+        "\r\n",
+        "\n"
+      ]
+    }
+  ]
+}
