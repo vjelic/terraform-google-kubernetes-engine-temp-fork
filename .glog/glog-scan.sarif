@@ -12,31 +12,7 @@
           "informationUri": "https://www.glog.ai",
           "rules": [
             {
-              "id": "glog-696a0754-d29c-4756-b535-9747c0a4b40a",
-              "help": {
-                "text": "",
-                "markdown": "### Description\n\nThe vulnerability \"Cluster pod security policy is not enforced\" in Terraform arises when Kubernetes clusters are configured without enforcing Pod Security Policies (PSPs). PSPs are crucial for defining a set of conditions that a pod must meet to be accepted into the system, thus ensuring that pods run with the least privilege necessary. Without enforcing these policies, there is a risk that pods could be deployed with overly permissive configurations, potentially leading to privilege escalation, data breaches, or other security issues.\n\n### General Mitigation Advice\n\n1. **Enable Pod Security Policies**: Ensure that PSPs are enabled and enforced in your Kubernetes cluster. This involves configuring the Kubernetes API server to use the `PodSecurityPolicy` admission controller.\n\n2. **Define and Apply Policies**: Create PSPs that define the security requirements for your pods, such as restricting the use of privileged containers, controlling access to host resources, and limiting capabilities.\n\n3. **Review and Update Regularly**: Regularly review and update your PSPs to adapt to new security threats and changes in your application requirements.\n\n4. **Use Role-Based Access Control (RBAC)**: Combine PSPs with RBAC to control which users and service accounts can create pods that use specific PSPs.\n\n### Source Code Fix Recommendation\n\nTo enforce Pod Security Policies in a Kubernetes cluster managed by Terraform, you can follow these steps:\n\n1. **Enable the PodSecurityPolicy Admission Controller**: Ensure that the Kubernetes API server is configured to use the `PodSecurityPolicy` admission controller. This might involve modifying the API server's configuration.\n\n2. **Create a Pod Security Policy**: Define a PSP in your Terraform configuration. For example:\n\n    ```hcl\n    resource \"kubernetes_pod_security_policy\" \"example\" {\n      metadata {\n        name = \"example-psp\"\n      }\n\n      spec {\n        privileged = false\n\n        se_linux {\n          rule = \"RunAsAny\"\n        }\n\n        run_as_user {\n          rule = \"MustRunAsNonRoot\"\n        }\n\n        fs_group {\n          rule = \"MustRunAs\"\n          ranges {\n            min = 1\n            max = 65535\n          }\n        }\n\n        supplemental_groups {\n          rule = \"MustRunAs\"\n          ranges {\n            min = 1\n            max = 65535\n          }\n        }\n      }\n    }\n    ```\n\n3. **Bind the PSP to Users or Service Accounts**: Use RBAC to bind the PSP to specific users or service accounts. For example:\n\n    ```hcl\n    resource \"kubernetes_role\" \"psp_role\" {\n      metadata {\n        name = \"psp-role\"\n      }\n\n      rule {\n        api_groups = [\"\"]\n        resources  = [\"podsecuritypolicies\"]\n        verbs      = [\"use\"]\n      }\n    }\n\n    resource \"kubernetes_role_binding\" \"psp_role_binding\" {\n      metadata {\n        name = \"psp-role-binding\"\n      }\n\n      role_ref {\n        api_group = \"rbac.authorization.k8s.io\"\n        kind      = \"Role\"\n        name      = kubernetes_role.psp_role.metadata[0].name\n      }\n\n      subject {\n        kind      = \"User\"\n        name      = \"example-user\"\n        api_group = \"rbac.authorization.k8s.io\"\n      }\n    }\n    ```\n\n### Relevant Resources\n\n- [OWASP Kubernetes Security Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Kubernetes_Security_Cheat_Sheet.html)\n- [OWASP Top Ten Kubernetes Risks](https://owasp.org/www-project-kubernetes-top-ten/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-284: Improper Access Control](https://cwe.mitre.org/data/definitions/284.html)"
-              },
-              "properties": {
-                "tags": [
-                  "google-gke-enforce-pod-security-policy"
-                ]
-              }
-            },
-            {
-              "id": "glog-2299b263-e2e6-49bc-bf99-fc387fe9652d",
-              "help": {
-                "text": "",
-                "markdown": "```markdown\n### Description\n\nThe vulnerability \"Cluster does not have private nodes\" in Terraform arises when a Kubernetes cluster is configured with public nodes, exposing them to the internet. This can lead to potential security risks, such as unauthorized access and data breaches, as the nodes are accessible from outside the private network. Ensuring that nodes are private helps in restricting access to the cluster, thereby enhancing security.\n\n### General Mitigation Advice\n\nTo mitigate this vulnerability, ensure that the Kubernetes cluster nodes are configured to be private. This involves setting up the cluster in a way that nodes are not directly accessible from the internet. Use private IP addresses and configure network policies to restrict access.\n\n### Source Code Fix Recommendation\n\nWhen using Terraform to manage your Kubernetes cluster, you can ensure that nodes are private by setting the appropriate configuration options. Below is an example of how you can configure a Google Kubernetes Engine (GKE) cluster with private nodes:\n\n```hcl\nresource \"google_container_cluster\" \"private_cluster\" {\n  name     = \"my-private-cluster\"\n  location = \"us-central1\"\n\n  # Enable private nodes\n  private_cluster_config {\n    enable_private_nodes = true\n    master_ipv4_cidr_block = \"10.0.0.0/28\"\n  }\n\n  # Other necessary configurations\n  initial_node_count = 1\n\n  # Enable private endpoint\n  private_cluster_config {\n    enable_private_endpoint = true\n  }\n}\n```\n\nIn this example, `enable_private_nodes` is set to `true`, which ensures that the nodes are private. Additionally, `enable_private_endpoint` is set to `true` to restrict access to the master endpoint.\n\n### Relevant Resources\n\n- [OWASP Kubernetes Security Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Kubernetes_Security_Cheat_Sheet.html)\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-200: Exposure of Sensitive Information to an Unauthorized Actor](https://cwe.mitre.org/data/definitions/200.html)\n```"
-              },
-              "properties": {
-                "tags": [
-                  "google-gke-enable-private-cluster"
-                ]
-              }
-            },
-            {
-              "id": "glog-72d4203d-af45-4b54-a6d6-70eddda20385",
+              "id": "glog-cd01e380-472c-4e8b-8cc2-51ced4b93b1e",
               "help": {
                 "text": "",
                 "markdown": "### Description\n\nThe vulnerability \"Cluster does not have a network policy enabled\" in Terraform refers to the absence of network policies in a Kubernetes cluster. Network policies are crucial for defining how pods communicate with each other and with other network endpoints. Without these policies, there is a risk of unrestricted communication, which can lead to potential security breaches, such as unauthorized access or data exfiltration.\n\n### General Mitigation Advice\n\nTo mitigate this vulnerability, it is essential to enable and configure network policies in your Kubernetes cluster. This involves defining rules that specify which pods can communicate with each other and under what conditions. By doing so, you can enforce a zero-trust network model, minimizing the risk of unauthorized access.\n\n### Source Code Fix Recommendation\n\nTo enable network policies in a Kubernetes cluster using Terraform, you can modify your Terraform configuration to include a network policy resource. Below is an example of how you can define a basic network policy:\n\n```hcl\nresource \"kubernetes_network_policy\" \"example\" {\n  metadata {\n    name      = \"example-network-policy\"\n    namespace = \"default\"\n  }\n\n  spec {\n    pod_selector {\n      match_labels = {\n        role = \"db\"\n      }\n    }\n\n    policy_types = [\"Ingress\", \"Egress\"]\n\n    ingress {\n      from {\n        pod_selector {\n          match_labels = {\n            role = \"frontend\"\n          }\n        }\n      }\n    }\n\n    egress {\n      to {\n        pod_selector {\n          match_labels = {\n            role = \"backend\"\n          }\n        }\n      }\n    }\n  }\n}\n```\n\nThis example creates a network policy that allows ingress traffic to pods with the label `role=db` from pods with the label `role=frontend`, and egress traffic to pods with the label `role=backend`.\n\n### Relevant Resources\n\n- [OWASP Kubernetes Security Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Kubernetes_Security_Cheat_Sheet.html)\n- [OWASP Top Ten Kubernetes Security Risks](https://owasp.org/www-project-kubernetes-top-ten/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-284: Improper Access Control](https://cwe.mitre.org/data/definitions/284.html)\n\nThese resources provide further guidance on securing Kubernetes environments and understanding access control vulnerabilities."
@@ -48,7 +24,7 @@
               }
             },
             {
-              "id": "glog-02afb973-bc8d-41c7-86e5-eb9e8d50f322",
+              "id": "glog-07adbe7a-ff62-4685-8143-3ae61f2cc816",
               "help": {
                 "text": "",
                 "markdown": "### Description\n\nThe vulnerability \"Cluster does not have master authorized networks enabled\" in Terraform refers to a security misconfiguration in Google Kubernetes Engine (GKE) clusters. When master authorized networks are not enabled, the Kubernetes API server is accessible from any IP address, which increases the risk of unauthorized access. This can lead to potential exposure of sensitive data and unauthorized control over the cluster.\n\n### General Mitigation Advice\n\nTo mitigate this vulnerability, it is recommended to enable master authorized networks. This restricts access to the Kubernetes API server to a specified set of IP addresses, reducing the risk of unauthorized access.\n\n### Source Code Fix Recommendation\n\nTo enable master authorized networks in a Terraform configuration for a GKE cluster, you can modify the `google_container_cluster` resource to include the `master_authorized_networks_config` block. Here is an example of how to implement this:\n\n```hcl\nresource \"google_container_cluster\" \"example\" {\n  name     = \"example-cluster\"\n  location = \"us-central1\"\n\n  # Other cluster configuration...\n\n  master_authorized_networks_config {\n    cidr_blocks = [\n      {\n        cidr_block   = \"192.168.1.0/24\"\n        display_name = \"Office Network\"\n      },\n      {\n        cidr_block   = \"203.0.113.0/32\"\n        display_name = \"Admin Workstation\"\n      }\n    ]\n  }\n}\n```\n\nIn this example, replace the `cidr_block` values with the IP addresses or ranges that should have access to the Kubernetes API server.\n\n### Relevant Resources\n\n- [OWASP Kubernetes Security Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Kubernetes_Security_Cheat_Sheet.html)\n- [CWE-284: Improper Access Control](https://cwe.mitre.org/data/definitions/284.html)\n\nThese resources provide additional guidance on securing Kubernetes environments and understanding access control vulnerabilities."
@@ -60,7 +36,31 @@
               }
             },
             {
-              "id": "glog-c1bc751d-a700-4515-885d-406d631b3db2",
+              "id": "glog-00080a2e-a405-4ae2-8c97-433197ba6d9a",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nThe vulnerability \"Cluster pod security policy is not enforced\" in Terraform arises when Kubernetes clusters are configured without enforcing Pod Security Policies (PSPs). PSPs are crucial for defining a set of conditions that a pod must meet to be accepted into the system, thus ensuring that pods run with the least privilege necessary. Without enforcing these policies, there is a risk that pods could be deployed with overly permissive configurations, potentially leading to privilege escalation, data breaches, or other security issues.\n\n### General Mitigation Advice\n\n1. **Enable Pod Security Policies**: Ensure that PSPs are enabled and enforced in your Kubernetes cluster. This involves configuring the Kubernetes API server to use the `PodSecurityPolicy` admission controller.\n\n2. **Define and Apply Policies**: Create PSPs that define the security requirements for your pods, such as restricting the use of privileged containers, controlling access to host resources, and limiting capabilities.\n\n3. **Review and Update Regularly**: Regularly review and update your PSPs to adapt to new security threats and changes in your application requirements.\n\n4. **Use Role-Based Access Control (RBAC)**: Combine PSPs with RBAC to control which users and service accounts can create pods that use specific PSPs.\n\n### Source Code Fix Recommendation\n\nTo enforce Pod Security Policies in a Kubernetes cluster managed by Terraform, you can follow these steps:\n\n1. **Enable the PodSecurityPolicy Admission Controller**: Ensure that the Kubernetes API server is configured to use the `PodSecurityPolicy` admission controller. This might involve modifying the API server's configuration.\n\n2. **Create a Pod Security Policy**: Define a PSP in your Terraform configuration. For example:\n\n    ```hcl\n    resource \"kubernetes_pod_security_policy\" \"example\" {\n      metadata {\n        name = \"example-psp\"\n      }\n\n      spec {\n        privileged = false\n\n        se_linux {\n          rule = \"RunAsAny\"\n        }\n\n        run_as_user {\n          rule = \"MustRunAsNonRoot\"\n        }\n\n        fs_group {\n          rule = \"MustRunAs\"\n          ranges {\n            min = 1\n            max = 65535\n          }\n        }\n\n        supplemental_groups {\n          rule = \"MustRunAs\"\n          ranges {\n            min = 1\n            max = 65535\n          }\n        }\n      }\n    }\n    ```\n\n3. **Bind the PSP to Users or Service Accounts**: Use RBAC to bind the PSP to specific users or service accounts. For example:\n\n    ```hcl\n    resource \"kubernetes_role\" \"psp_role\" {\n      metadata {\n        name = \"psp-role\"\n      }\n\n      rule {\n        api_groups = [\"\"]\n        resources  = [\"podsecuritypolicies\"]\n        verbs      = [\"use\"]\n      }\n    }\n\n    resource \"kubernetes_role_binding\" \"psp_role_binding\" {\n      metadata {\n        name = \"psp-role-binding\"\n      }\n\n      role_ref {\n        api_group = \"rbac.authorization.k8s.io\"\n        kind      = \"Role\"\n        name      = kubernetes_role.psp_role.metadata[0].name\n      }\n\n      subject {\n        kind      = \"User\"\n        name      = \"example-user\"\n        api_group = \"rbac.authorization.k8s.io\"\n      }\n    }\n    ```\n\n### Relevant Resources\n\n- [OWASP Kubernetes Security Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Kubernetes_Security_Cheat_Sheet.html)\n- [OWASP Top Ten Kubernetes Risks](https://owasp.org/www-project-kubernetes-top-ten/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-284: Improper Access Control](https://cwe.mitre.org/data/definitions/284.html)"
+              },
+              "properties": {
+                "tags": [
+                  "google-gke-enforce-pod-security-policy"
+                ]
+              }
+            },
+            {
+              "id": "glog-dca1b738-eea5-43eb-a278-6ab1ffabff48",
+              "help": {
+                "text": "",
+                "markdown": "```markdown\n### Description\n\nThe vulnerability \"Cluster does not have private nodes\" in Terraform arises when a Kubernetes cluster is configured with public nodes, exposing them to the internet. This can lead to potential security risks, such as unauthorized access and data breaches, as the nodes are accessible from outside the private network. Ensuring that nodes are private helps in restricting access to the cluster, thereby enhancing security.\n\n### General Mitigation Advice\n\nTo mitigate this vulnerability, ensure that the Kubernetes cluster nodes are configured to be private. This involves setting up the cluster in a way that nodes are not directly accessible from the internet. Use private IP addresses and configure network policies to restrict access.\n\n### Source Code Fix Recommendation\n\nWhen using Terraform to manage your Kubernetes cluster, you can ensure that nodes are private by setting the appropriate configuration options. Below is an example of how you can configure a Google Kubernetes Engine (GKE) cluster with private nodes:\n\n```hcl\nresource \"google_container_cluster\" \"private_cluster\" {\n  name     = \"my-private-cluster\"\n  location = \"us-central1\"\n\n  # Enable private nodes\n  private_cluster_config {\n    enable_private_nodes = true\n    master_ipv4_cidr_block = \"10.0.0.0/28\"\n  }\n\n  # Other necessary configurations\n  initial_node_count = 1\n\n  # Enable private endpoint\n  private_cluster_config {\n    enable_private_endpoint = true\n  }\n}\n```\n\nIn this example, `enable_private_nodes` is set to `true`, which ensures that the nodes are private. Additionally, `enable_private_endpoint` is set to `true` to restrict access to the master endpoint.\n\n### Relevant Resources\n\n- [OWASP Kubernetes Security Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Kubernetes_Security_Cheat_Sheet.html)\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-200: Exposure of Sensitive Information to an Unauthorized Actor](https://cwe.mitre.org/data/definitions/200.html)\n```"
+              },
+              "properties": {
+                "tags": [
+                  "google-gke-enable-private-cluster"
+                ]
+              }
+            },
+            {
+              "id": "glog-2729a343-a9b1-45e8-ab82-826262f02446",
               "help": {
                 "text": "",
                 "markdown": "```markdown\n### Description\n\nThe vulnerability \"Cluster has legacy metadata endpoints enabled\" in Terraform refers to the potential security risk when a cloud cluster is configured to allow access to legacy metadata endpoints. These endpoints can expose sensitive information about the cloud environment, such as instance metadata, which can be exploited by attackers to gain unauthorized access or escalate privileges within the cloud infrastructure.\n\n### General Mitigation Advice\n\nTo mitigate this vulnerability, it is recommended to disable legacy metadata endpoints and ensure that only the latest, more secure metadata services are enabled. This can be achieved by configuring the cloud provider's settings to restrict access to these endpoints and by using the latest security features provided by the cloud service.\n\n### Source Code Fix Recommendation\n\nIn Terraform, you can address this issue by updating your configuration to disable legacy metadata endpoints. Below is an example of how you might configure a Google Kubernetes Engine (GKE) cluster to disable legacy metadata endpoints:\n\n```hcl\nresource \"google_container_cluster\" \"primary\" {\n  name     = \"my-gke-cluster\"\n  location = \"us-central1\"\n\n  # Other cluster configuration...\n\n  # Disable legacy metadata endpoints\n  node_config {\n    metadata {\n      disable-legacy-endpoints = true\n    }\n  }\n}\n```\n\nThis configuration ensures that the legacy metadata endpoints are disabled for the nodes in the GKE cluster.\n\n### Relevant OWASP Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-200: Exposure of Sensitive Information to an Unauthorized Actor](https://cwe.mitre.org/data/definitions/200.html)\n```"
@@ -72,7 +72,7 @@
               }
             },
             {
-              "id": "glog-6d564aea-d215-45e3-904b-7e92d56e7c88",
+              "id": "glog-15620113-cb38-458f-af83-9f905f70871a",
               "help": {
                 "text": "",
                 "markdown": "### Description\n\nThe vulnerability \"Cluster does not use GCE resource labels\" in Terraform arises when Google Cloud Engine (GCE) resources, such as clusters, are not tagged with labels. Labels are key-value pairs that help organize and manage resources by providing metadata that can be used for filtering, grouping, and identifying resources. Without labels, it becomes challenging to manage resources effectively, leading to potential security risks, increased costs, and operational inefficiencies.\n\n### General Mitigation Advice\n\nTo mitigate this vulnerability, ensure that all GCE resources, including clusters, are tagged with appropriate labels. This practice enhances resource management, cost tracking, and security posture by enabling better organization and identification of resources.\n\n### Source Code Fix Recommendation\n\nTo fix this issue in Terraform, you should define labels within your resource configuration. Here is an example of how to add labels to a GCE cluster resource:\n\n```hcl\nresource \"google_container_cluster\" \"example\" {\n  name     = \"example-cluster\"\n  location = \"us-central1\"\n\n  # Add labels to the cluster\n  resource_labels = {\n    environment = \"production\"\n    team        = \"devops\"\n    project     = \"example-project\"\n  }\n\n  # Other cluster configurations...\n}\n```\n\n### OWASP Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-200: Exposure of Sensitive Information to an Unauthorized Actor](https://cwe.mitre.org/data/definitions/200.html)\n- [CWE-285: Improper Authorization](https://cwe.mitre.org/data/definitions/285.html)\n\nThese resources and links provide further insights into best practices for securing cloud resources and understanding common security weaknesses."
@@ -95,49 +95,7 @@
       "language": "en-US",
       "results": [
         {
-          "ruleId": "glog-696a0754-d29c-4756-b535-9747c0a4b40a",
-          "kind": "fail",
-          "level": "error",
-          "message": {
-            "text": "Cluster pod security policy is not enforced."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "cluster.tf"
-                },
-                "region": {
-                  "startLine": 22,
-                  "endLine": 614
-                }
-              }
-            }
-          ]
-        },
-        {
-          "ruleId": "glog-2299b263-e2e6-49bc-bf99-fc387fe9652d",
-          "kind": "fail",
-          "level": "warning",
-          "message": {
-            "text": "Cluster does not have private nodes."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "cluster.tf"
-                },
-                "region": {
-                  "startLine": 22,
-                  "endLine": 614
-                }
-              }
-            }
-          ]
-        },
-        {
-          "ruleId": "glog-72d4203d-af45-4b54-a6d6-70eddda20385",
+          "ruleId": "glog-cd01e380-472c-4e8b-8cc2-51ced4b93b1e",
           "kind": "fail",
           "level": "warning",
           "message": {
@@ -158,7 +116,7 @@
           ]
         },
         {
-          "ruleId": "glog-02afb973-bc8d-41c7-86e5-eb9e8d50f322",
+          "ruleId": "glog-07adbe7a-ff62-4685-8143-3ae61f2cc816",
           "kind": "fail",
           "level": "error",
           "message": {
@@ -179,7 +137,49 @@
           ]
         },
         {
-          "ruleId": "glog-c1bc751d-a700-4515-885d-406d631b3db2",
+          "ruleId": "glog-00080a2e-a405-4ae2-8c97-433197ba6d9a",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Cluster pod security policy is not enforced."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cluster.tf"
+                },
+                "region": {
+                  "startLine": 22,
+                  "endLine": 614
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "glog-dca1b738-eea5-43eb-a278-6ab1ffabff48",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Cluster does not have private nodes."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cluster.tf"
+                },
+                "region": {
+                  "startLine": 22,
+                  "endLine": 614
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "glog-2729a343-a9b1-45e8-ab82-826262f02446",
           "kind": "fail",
           "level": "error",
           "message": {
@@ -200,7 +200,7 @@
           ]
         },
         {
-          "ruleId": "glog-6d564aea-d215-45e3-904b-7e92d56e7c88",
+          "ruleId": "glog-15620113-cb38-458f-af83-9f905f70871a",
           "kind": "fail",
           "level": "note",
           "message": {
